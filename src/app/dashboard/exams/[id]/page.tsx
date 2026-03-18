@@ -50,7 +50,7 @@ export default async function ExamDetailsPage({ params }: { params: Promise<{ id
           {exam.due_date && (
             <>
               <span>•</span>
-              <span className="text-red-600 font-medium">Límite: {new Date(exam.due_date).toLocaleString()}</span>
+              <span className="text-red-600 font-medium">Límite: {new Date(exam.due_date).toLocaleString('es-CO', { timeZone: 'America/Bogota' })}</span>
             </>
           )}
         </div>

@@ -17,10 +17,19 @@ export default function EditExamSettings({ exam, onUpdated }: { exam: any, onUpd
     )
   }
 
-  const initialDateStr = exam.due_date ? new Date(new Date(exam.due_date).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''
+  // Manejar el tiempo en zona horaria de Bogotá (UTC-5)
+  const getBogotaDateStr = (dateVal?: string) => {
+    if (!dateVal) return ''
+    const d = new Date(dateVal)
+    const bogotaDate = new Date(d.toLocaleString('en-US', { timeZone: 'America/Bogota' }))
+    const pad = (n: number) => n.toString().padStart(2, '0')
+    return `${bogotaDate.getFullYear()}-${pad(bogotaDate.getMonth()+1)}-${pad(bogotaDate.getDate())}T${pad(bogotaDate.getHours())}:${pad(bogotaDate.getMinutes())}`
+  }
+
+  const initialDateStr = getBogotaDateStr(exam.due_date)
   const initialDate = initialDateStr.split('T')[0] || ''
   const initialTime = initialDateStr.split('T')[1] || ''
-  const todayStr = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]
+  const todayStr = getBogotaDateStr(new Date().toISOString()).split('T')[0]
 
   return (
     <form action={async (formData) => {
@@ -30,8 +39,8 @@ export default function EditExamSettings({ exam, onUpdated }: { exam: any, onUpd
       formData.delete('due_date_time')
       
       if (datePart && timePart) {
-        // Combinar fecha y hora para la DB
-        formData.append('due_date', `${datePart}T${timePart}`)
+        // Combinar fecha y hora para la DB forzando el huso horario de Colombia (UTC-5)
+        formData.append('due_date', `${datePart}T${timePart}:00-05:00`)
       } else {
         formData.append('due_date', '')
       }

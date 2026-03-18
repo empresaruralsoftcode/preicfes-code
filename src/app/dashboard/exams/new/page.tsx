@@ -56,7 +56,7 @@ export default async function NewExamPage({ searchParams }: { searchParams: Prom
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="duration_minutes">Duración (Minutos)</Label>
-                <Input id="duration_minutes" name="duration_minutes" type="number" min="10" required placeholder="60" />
+                <Input id="duration_minutes" name="duration_minutes" type="number" min="5" required placeholder="60" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="question_count">Número de Preguntas</Label>

@@ -73,7 +73,7 @@ export default async function StudentResultsPage() {
                 ) : (
                   results.map((res: any) => {
                     const status = res.end_time ? 'Terminado' : (res.start_time ? 'En Progreso' : 'Asignado')
-                    const dateStr = res.end_time ? new Date(res.end_time).toLocaleString() : '-'
+                    const dateStr = res.end_time ? new Date(res.end_time).toLocaleString('es-CO', { timeZone: 'America/Bogota' }) : '-'
                     const scoreDisplay = res.score !== null ? `${res.score} Puntos` : '-'
                     
                     return (

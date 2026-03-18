@@ -68,7 +68,7 @@ export default async function StudentExamPage({ params }: { params: Promise<{ id
       <div className="min-h-screen flex items-center justify-center bg-muted/20">
         <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full border border-gray-100">
           <h2 className="text-2xl font-bold text-red-600 mb-4">Simulacro Cerrado</h2>
-          <p className="text-muted-foreground mb-6">La fecha y hora límite para realizar este simulacro ({new Date(exam.due_date).toLocaleString()}) ha expirado.</p>
+          <p className="text-muted-foreground mb-6">La fecha y hora límite para realizar este simulacro ({new Date(exam.due_date).toLocaleString('es-CO', { timeZone: 'America/Bogota' })}) ha expirado.</p>
           <a href="/dashboard" className="mt-4 inline-block px-4 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition">
              Volver al Inicio
           </a>

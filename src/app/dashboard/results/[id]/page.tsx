@@ -98,7 +98,7 @@ export default async function ExamRevisionPage({ params }: { params: Promise<{ i
                {studentExam.score !== null ? studentExam.score : 0} / {totalPossiblePoints} <span className="text-sm">Pts</span>
              </div>
              <p className="text-xs text-muted-foreground mt-2">
-               {studentExam.end_time ? 'Terminado el: ' + new Date(studentExam.end_time).toLocaleString() : 'En Progreso o Asignado'}
+               {studentExam.end_time ? 'Terminado el: ' + new Date(studentExam.end_time).toLocaleString('es-CO', { timeZone: 'America/Bogota' }) : 'En Progreso o Asignado'}
              </p>
              {closedQuestions.length > 0 && (
                <div className="flex justify-end gap-3 mt-3 text-sm">
