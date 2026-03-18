@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResultRow } from './ResultRow'
+import { ReassignButton } from './ReassignButton'
 
 export default async function StudentResultsPage() {
   const supabase = await createClient()
@@ -61,12 +62,13 @@ export default async function StudentResultsPage() {
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Estado</th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Puntaje</th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Fecha Terminado</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
               <tbody className="[&_tr:last-child]:border-0">
                 {!results || results.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                    <td colSpan={6} className="p-4 text-center text-muted-foreground">
                       No hay datos de estudiantes asignados a tus simulacros.
                     </td>
                   </tr>
@@ -91,6 +93,15 @@ export default async function StudentResultsPage() {
                         </td>
                         <td className="p-4 align-middle">{scoreDisplay}</td>
                         <td className="p-4 align-middle">{dateStr}</td>
+                        <td className="p-4 align-middle text-center">
+                          {res.end_time && (
+                            <ReassignButton 
+                              studentExamId={res.id}
+                              studentName={res.profiles?.name || 'Estudiante'}
+                              examTitle={res.exams?.title || 'Simulacro'}
+                            />
+                          )}
+                        </td>
                       </ResultRow>
                     )
                   })
