@@ -80,14 +80,14 @@ export default async function StudentExamPage({ params }: { params: Promise<{ id
   const componentInfo = Array.isArray(exam.components) ? exam.components[0] : exam.components
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 pb-12">
-      <div className="sticky top-0 z-50 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 shadow-sm px-4 md:px-8 py-3 flex justify-between items-center">
+    <div className="min-h-screen bg-slate-50/80 pb-12">
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)] px-4 md:px-8 py-3 flex justify-between items-center">
          <div>
-            <h1 className="text-xl font-bold">{exam.title}</h1>
-            <p className="text-xs text-muted-foreground uppercase font-semibold">{componentInfo?.name}</p>
+            <h1 className="text-xl font-bold text-slate-900">{exam.title}</h1>
+            <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">{componentInfo?.name}</p>
          </div>
          {/* The client component will handle the countdown */}
-         <div id="exam-timer-placeholder" className="bg-red-50 text-red-700 font-mono text-lg font-bold px-4 py-1.5 rounded border border-red-200" />
+         <div id="exam-timer-placeholder" className="bg-blue-50 text-blue-700 font-mono text-lg font-bold px-5 py-2 rounded-xl border border-blue-200 shadow-sm" />
       </div>
 
       <main className="max-w-4xl mx-auto mt-8 px-4">
