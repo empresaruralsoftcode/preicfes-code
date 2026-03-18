@@ -53,8 +53,9 @@ export async function createUserByAdminAction(formData: FormData) {
 
   if (error) {
      console.error('Error creating user by admin:', error)
-     throw new Error('Error al crear usuario. Revisa si el correo ya existe.')
+     return { error: 'Error al crear usuario. Revisa si el correo ya existe o comunícate con soporte.' }
   }
   
   revalidatePath('/dashboard')
+  return { success: true }
 }

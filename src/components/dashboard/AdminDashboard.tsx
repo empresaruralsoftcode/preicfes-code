@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { deleteUserAction, assignComponentAction, removeComponentAction, createUserByAdminAction } from './admin-actions'
+import { deleteUserAction, assignComponentAction, removeComponentAction } from './admin-actions'
+import { CreateUserForm } from './CreateUserForm'
 
 export default async function AdminDashboard({ userId }: { userId: string }) {
   const supabase = await createClient()
@@ -96,18 +96,12 @@ export default async function AdminDashboard({ userId }: { userId: string }) {
           </div>
           
           <div className="p-8 bg-gradient-to-t from-slate-100/90 to-slate-50/40 border-t border-white/60">
-             <form action={createUserByAdminAction} className="space-y-4">
-               <h4 className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest bg-indigo-100/50 inline-block px-3 py-1 rounded-full">✚ Registrar Nuevo Docente</h4>
-               <input type="hidden" name="role" value="teacher" />
-               <Input name="name" placeholder="Nombre completo" required className="bg-white/80 border-white/60 focus:bg-white focus:border-indigo-300 transition-colors rounded-xl h-12 shadow-sm" />
-               <div className="grid grid-cols-2 gap-3">
-                 <Input name="email" type="email" placeholder="Correo electrónico" required className="bg-white/80 border-white/60 focus:bg-white focus:border-indigo-300 transition-colors rounded-xl h-12 shadow-sm" />
-                 <Input name="password" type="text" placeholder="Contraseña" required className="bg-white/80 border-white/60 focus:bg-white focus:border-indigo-300 transition-colors rounded-xl h-12 shadow-sm" />
-               </div>
-               <Button type="submit" className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-200 transition-all mt-2">
-                 Crear Docente
-               </Button>
-             </form>
+             <CreateUserForm 
+               role="teacher" 
+               btnText="Crear Docente" 
+               badgeText="✚ Registrar Nuevo Docente" 
+               colorSchema="indigo" 
+             />
           </div>
         </div>
 
@@ -152,18 +146,12 @@ export default async function AdminDashboard({ userId }: { userId: string }) {
           </div>
           
           <div className="p-8 bg-gradient-to-t from-slate-100/90 to-slate-50/40 border-t border-white/60">
-             <form action={createUserByAdminAction} className="space-y-4">
-               <h4 className="text-[11px] font-bold text-emerald-700 uppercase tracking-widest bg-emerald-100/50 inline-block px-3 py-1 rounded-full">✚ Registrar Nuevo Estudiante</h4>
-               <input type="hidden" name="role" value="student" />
-               <Input name="name" placeholder="Nombre completo" required className="bg-white/80 border-white/60 focus:bg-white focus:border-emerald-300 transition-colors rounded-xl h-12 shadow-sm" />
-               <div className="grid grid-cols-2 gap-3">
-                 <Input name="email" type="email" placeholder="Correo electrónico" required className="bg-white/80 border-white/60 focus:bg-white focus:border-emerald-300 transition-colors rounded-xl h-12 shadow-sm" />
-                 <Input name="password" type="text" placeholder="Contraseña" required className="bg-white/80 border-white/60 focus:bg-white focus:border-emerald-300 transition-colors rounded-xl h-12 shadow-sm" />
-               </div>
-               <Button type="submit" className="w-full h-12 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-200 transition-all mt-2">
-                 Crear Estudiante
-               </Button>
-             </form>
+             <CreateUserForm 
+               role="student" 
+               btnText="Crear Estudiante" 
+               badgeText="✚ Registrar Nuevo Estudiante" 
+               colorSchema="emerald" 
+             />
           </div>
         </div>
       </div>
