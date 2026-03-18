@@ -1,6 +1,6 @@
 'use client'
 
-import { login, createAdminInitial } from './actions'
+import { login } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -100,15 +100,6 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
 
             <Button formAction={login} className="w-full h-11 rounded-lg font-semibold text-sm shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all">
               Iniciar Sesión
-            </Button>
-            
-            <div className="relative py-2">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-              <div className="relative flex justify-center"><span className="bg-slate-50/50 px-3 text-xs text-slate-400">¿Eres administrador?</span></div>
-            </div>
-            
-            <Button formAction={createAdminInitial} variant="ghost" className="w-full text-xs text-slate-500 hover:text-primary font-medium">
-              Crear cuenta de administrador inicial
             </Button>
           </form>
           
