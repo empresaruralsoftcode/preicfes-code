@@ -32,29 +32,40 @@ export default function ExamRunner({
 }) {
   const [answers, setAnswers] = useState<Record<string, any>>({})
   const [timeRemaining, setTimeRemaining] = useState(durationMinutes * 60)
-  
-  // Basic Timer Logic based on startTime 
+  const [isInitializing, setIsInitializing] = useState(true)
+  const answersRef = useRef(answers)
+  const draftKey = `draft_exam_${studentExamId}`
+
+  // Ensure refs are updated correctly for setInterval closures
   useEffect(() => {
-    const elapsedSeconds = Math.floor((Date.now() - new Date(startTime).getTime()) / 1000)
-    const initialTime = Math.max((durationMinutes * 60) - elapsedSeconds, 0)
-    setTimeRemaining(initialTime)
-    
-    const interval = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-           clearInterval(interval)
-           handleSubmit() // auto submit when time is up
-           return 0
+    answersRef.current = answers
+  }, [answers])
+
+  // Load state from local storage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(draftKey)
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed.answers) setAnswers(parsed.answers)
+        if (typeof parsed.timeRemaining === 'number') {
+           setTimeRemaining(parsed.timeRemaining)
         }
-        return prev - 1
-      })
-    }, 1000)
+      } catch (e) {
+         console.error('Error parsing draft state', e)
+      }
+    } else {
+      // First time opening the exam: Set based on start time difference
+      const elapsedSeconds = Math.floor((Date.now() - new Date(startTime).getTime()) / 1000)
+      const initialTime = Math.max((durationMinutes * 60) - elapsedSeconds, 0)
+      setTimeRemaining(initialTime)
+    }
+    setIsInitializing(false)
+  }, [draftKey, startTime, durationMinutes])
 
-    return () => clearInterval(interval)
-  }, [startTime, durationMinutes])
-
-  // Timer rendering via Portal to header (React 18 trick or direct sync)
+  // Timer rendering via Portal trick
   useEffect(() => {
+    if (isInitializing) return
     const el = document.getElementById('exam-timer-placeholder')
     if (el) {
        const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0')
@@ -64,7 +75,7 @@ export default function ExamRunner({
           el.className = 'bg-red-50 text-red-700 font-mono text-lg font-bold px-4 py-1.5 rounded border border-red-500 animate-pulse'
        }
     }
-  }, [timeRemaining])
+  }, [timeRemaining, isInitializing])
 
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -74,17 +85,41 @@ export default function ExamRunner({
      }
   }
 
+  // Tick timer and auto-save
+  useEffect(() => {
+    if (isInitializing) return
+    const interval = setInterval(() => {
+      setTimeRemaining((prev) => {
+        const nextTime = Math.max(prev - 1, 0)
+        
+        // Auto-save logic every second to LocalStorage
+        localStorage.setItem(draftKey, JSON.stringify({
+          answers: answersRef.current,
+          timeRemaining: nextTime
+        }))
+
+        // Auto submit if time runs out
+        if (nextTime <= 0) {
+           clearInterval(interval)
+           localStorage.removeItem(draftKey)
+           handleSubmit() 
+           return 0
+        }
+        return nextTime
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [draftKey, isInitializing])
+
   const handleOptionSelect = (qId: string, optId: string, type: 'single' | 'multiple') => {
     setAnswers((prev) => {
-      if (type === 'single') {
-        return { ...prev, [qId]: [optId] }
-      } else {
-        const existing = prev[qId] || []
-        const updated = existing.includes(optId) 
-            ? existing.filter((id: string) => id !== optId) 
-            : [...existing, optId]
-        return { ...prev, [qId]: updated }
-      }
+      if (type === 'single') return { ...prev, [qId]: [optId] }
+      
+      const existing = prev[qId] || []
+      const updated = existing.includes(optId) 
+          ? existing.filter((id: string) => id !== optId) 
+          : [...existing, optId]
+      return { ...prev, [qId]: updated }
     })
   }
 
@@ -92,9 +127,10 @@ export default function ExamRunner({
     setAnswers((prev) => ({ ...prev, [`${qId}_text`]: text }))
   }
 
+  if (isInitializing) return <div className="p-8 text-center text-muted-foreground animate-pulse">Cargando simulacro y borrador...</div>
+
   return (
     <form ref={formRef} action={async (formData) => {
-       // Convert state to form data entries safely
        formData.append('studentExamId', studentExamId)
        Object.entries(answers).forEach(([key, val]) => {
           if (Array.isArray(val)) {
@@ -103,6 +139,8 @@ export default function ExamRunner({
              formData.append(key, val)
           }
        })
+       // Final Cleanup
+       localStorage.removeItem(draftKey)
        await submitExam(formData)
     }} className="space-y-8">
       
@@ -163,12 +201,21 @@ export default function ExamRunner({
         </Card>
       ))}
 
-      <div className="p-6 bg-white dark:bg-zinc-950 rounded-xl shadow border flex justify-between items-center sticky bottom-6">
+      <div className="p-6 bg-white dark:bg-zinc-950 rounded-xl shadow border flex flex-col sm:flex-row gap-4 justify-between items-center sticky bottom-6">
         <p className="text-sm text-muted-foreground">
           Asegúrate de haber respondido todas las preguntas antes de finalizar.
         </p>
-        <Button type="submit" size="lg" className="px-8 font-semibold text-lg shadow-md">
-           Finalizar Simulacro
+        <Button 
+           type="button" 
+           size="lg" 
+           className="px-8 font-semibold text-lg shadow-md"
+           onClick={() => {
+             if (window.confirm('¿Estás SEGURO de finalizar el simulacro y enviar tus respuestas de forma definitiva?')) {
+               handleSubmit()
+             }
+           }}
+        >
+           Finalizar y Enviar
         </Button>
       </div>
 

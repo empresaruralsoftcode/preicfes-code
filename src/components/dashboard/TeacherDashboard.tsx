@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { AssignExamModal } from './AssignExamModal'
+import { DeleteExamButton } from './DeleteExamButton'
 
 export default async function TeacherDashboard({ userId }: { userId: string }) {
   const supabase = await createClient()
@@ -61,14 +62,12 @@ export default async function TeacherDashboard({ userId }: { userId: string }) {
                   <Button variant={exam.is_draft ? 'default' : 'secondary'} className="w-full" asChild>
                     <Link href={`/dashboard/exams/${exam.id}`}>{exam.is_draft ? 'Continuar Creando' : 'Editar'}</Link>
                   </Button>
-                  <form action={async () => {
+                  <form>
+                    <DeleteExamButton onConfirmAction={async () => {
                       'use server'
                       const { deleteExam } = await import('@/app/dashboard/exams/actions')
                       await deleteExam(exam.id)
-                    }}>
-                    <Button type="submit" variant="destructive" size="icon" title="Eliminar Simulacro">
-                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                    </Button>
+                    }} />
                   </form>
                 </div>
               </CardContent>
