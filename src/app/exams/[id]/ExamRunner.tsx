@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { submitExam } from './actions'
 import { Input } from '@/components/ui/input'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import 'katex/dist/katex.min.css'
 import 'react-quill-new/dist/quill.snow.css'
 
@@ -33,6 +34,7 @@ export default function ExamRunner({
   const [answers, setAnswers] = useState<Record<string, any>>({})
   const [timeRemaining, setTimeRemaining] = useState(durationMinutes * 60)
   const [isInitializing, setIsInitializing] = useState(true)
+  const [showFinishModal, setShowFinishModal] = useState(false)
   const answersRef = useRef(answers)
   const draftKey = `draft_exam_${studentExamId}`
 
@@ -201,23 +203,33 @@ export default function ExamRunner({
         </Card>
       ))}
 
-      <div className="p-6 bg-white dark:bg-zinc-950 rounded-xl shadow border flex flex-col sm:flex-row gap-4 justify-between items-center sticky bottom-6">
-        <p className="text-sm text-muted-foreground">
+      <div className="p-6 bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg border border-slate-200/60 flex flex-col sm:flex-row gap-4 justify-between items-center sticky bottom-6">
+        <p className="text-sm text-slate-500">
           Asegúrate de haber respondido todas las preguntas antes de finalizar.
         </p>
         <Button 
            type="button" 
            size="lg" 
-           className="px-8 font-semibold text-lg shadow-md"
-           onClick={() => {
-             if (window.confirm('¿Estás SEGURO de finalizar el simulacro y enviar tus respuestas de forma definitiva?')) {
-               handleSubmit()
-             }
-           }}
+           className="px-8 font-semibold text-base rounded-xl shadow-md shadow-blue-500/20 hover:shadow-blue-500/30 transition-all hover:scale-[1.02]"
+           onClick={() => setShowFinishModal(true)}
         >
            Finalizar y Enviar
         </Button>
       </div>
+
+      <ConfirmModal
+        open={showFinishModal}
+        onClose={() => setShowFinishModal(false)}
+        onConfirm={() => {
+          setShowFinishModal(false)
+          handleSubmit()
+        }}
+        variant="warning"
+        title="Finalizar Simulacro"
+        description="¿Estás seguro de que deseas finalizar y enviar todas tus respuestas? Una vez enviadas no podrás modificarlas. Las preguntas sin responder se marcarán como incorrectas."
+        confirmText="Sí, Finalizar y Enviar"
+        cancelText="Seguir Respondiendo"
+      />
 
     </form>
   )
