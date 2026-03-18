@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { AssignExamModal } from './AssignExamModal'
 import { DeleteExamButton } from './DeleteExamButton'
+import { ToggleExamButton } from './ToggleExamButton'
 
 export default async function TeacherDashboard({ userId }: { userId: string }) {
   const supabase = await createClient()
@@ -41,9 +42,9 @@ export default async function TeacherDashboard({ userId }: { userId: string }) {
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {exams && exams.length > 0 ? (
           exams.map((exam) => (
-            <Card key={exam.id} className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-slate-200/50 ${exam.is_draft ? 'opacity-80 border-dashed border-2 border-slate-300 hover:opacity-100' : 'border-slate-200/80 hover:border-blue-200'}`}>
+            <Card key={exam.id} className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-slate-200/50 ${exam.is_draft ? 'opacity-80 border-dashed border-2 border-slate-300 hover:opacity-100' : !exam.is_active ? 'opacity-60 border-slate-200 grayscale-[30%] hover:opacity-80' : 'border-slate-200/80 hover:border-blue-200'}`}>
               {/* Top accent line */}
-              <div className={`absolute top-0 left-0 right-0 h-1 ${exam.is_draft ? 'bg-amber-400' : 'bg-gradient-to-r from-blue-500 to-indigo-500'}`} />
+              <div className={`absolute top-0 left-0 right-0 h-1 ${exam.is_draft ? 'bg-amber-400' : !exam.is_active ? 'bg-slate-300' : 'bg-gradient-to-r from-blue-500 to-indigo-500'}`} />
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -53,6 +54,9 @@ export default async function TeacherDashboard({ userId }: { userId: string }) {
                     {exam.is_draft && (
                       <span className="bg-amber-50 text-amber-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border border-amber-200">Borrador</span>
                     )}
+                    {!exam.is_draft && !exam.is_active && (
+                      <span className="bg-slate-100 text-slate-500 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border border-slate-200">Deshabilitado</span>
+                    )}
                   </div>
                   <span className="text-xs text-slate-400 font-medium">{exam.duration_minutes} min</span>
                 </div>
@@ -61,7 +65,7 @@ export default async function TeacherDashboard({ userId }: { userId: string }) {
                   {exam.question_count} preguntas
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <div className="flex gap-2">
                   {!exam.is_draft && <AssignExamModal examId={exam.id} examTitle={exam.title} />}
                   <Button variant={exam.is_draft ? 'default' : 'secondary'} className="w-full rounded-lg text-sm" asChild>
@@ -75,6 +79,19 @@ export default async function TeacherDashboard({ userId }: { userId: string }) {
                     }} />
                   </form>
                 </div>
+                {!exam.is_draft && (
+                  <div className="flex justify-center border-t border-slate-100 pt-2">
+                    <ToggleExamButton 
+                      examId={exam.id} 
+                      isActive={exam.is_active ?? true}
+                      onToggle={async (id: string, newState: boolean) => {
+                        'use server'
+                        const { toggleExamActive } = await import('@/app/dashboard/exams/actions')
+                        await toggleExamActive(id, newState)
+                      }}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))

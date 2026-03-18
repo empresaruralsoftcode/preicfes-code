@@ -40,3 +40,11 @@ export async function reassignExam(studentExamId: string) {
   revalidatePath('/dashboard/results')
 }
 
+export async function toggleExamActive(examId: string, isActive: boolean) {
+  const supabase = await createClient()
+  await supabase
+    .from('exams')
+    .update({ is_active: isActive })
+    .eq('id', examId)
+  revalidatePath('/dashboard')
+}
